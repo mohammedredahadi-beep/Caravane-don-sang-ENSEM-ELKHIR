@@ -2,13 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gestion Caravane Don de Sang - ENSEM CIDH</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -21,6 +22,7 @@
             --neutral-dark: #1F1F1F;
             --neutral-light: #F8F9FA;
             --border-color: #D9D3E3;
+            --sidebar-width: 280px;
         }
 
         body {
@@ -28,17 +30,19 @@
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
             min-height: 100vh;
             color: var(--neutral-dark);
+            overflow-x: hidden;
         }
 
         .container {
             display: flex;
             min-height: 100vh;
+            position: relative;
         }
 
-        /* SIDEBAR */
+        /* --- SIDEBAR --- */
         .sidebar {
-            width: 280px;
-            background: rgba(62, 43, 95, 0.95);
+            width: var(--sidebar-width);
+            background: rgba(62, 43, 95, 0.98);
             backdrop-filter: blur(10px);
             padding: 30px 20px;
             box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
@@ -46,6 +50,11 @@
             flex-direction: column;
             gap: 40px;
             border-right: 1px solid rgba(155, 127, 196, 0.3);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
         }
 
         .logo-section {
@@ -65,9 +74,10 @@
         }
 
         .logo-section h1 {
-            font-size: 14px;
+            font-size: 16px;
             color: white;
             line-height: 1.2;
+            font-weight: 700;
         }
 
         .nav-menu {
@@ -84,14 +94,14 @@
             border-radius: 8px;
             color: rgba(255, 255, 255, 0.8);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
 
-        .nav-item:hover {
+        .nav-item:hover, .nav-item:active {
             background: rgba(155, 127, 196, 0.25);
             color: white;
         }
@@ -103,50 +113,70 @@
             box-shadow: inset 0 0 10px rgba(230, 57, 70, 0.1);
         }
 
-        .nav-icon {
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
-        }
-
-        /* MAIN CONTENT */
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
+            width: 100%;
+            min-width: 0;
         }
 
+        /* HEADER */
         .header {
             background: white;
-            padding: 25px 40px;
+            padding: 15px 30px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary-dark);
         }
 
         .header h2 {
-            font-size: 28px;
+            font-size: 24px;
             color: var(--primary-dark);
             font-weight: 700;
         }
 
         .header-actions {
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
         }
 
+        /* BOUTONS */
         .btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             font-size: 14px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -171,29 +201,26 @@
             border-color: var(--accent-light);
         }
 
+        /* ZONE DE CONTENU */
         .content-area {
             flex: 1;
-            overflow-y: auto;
-            padding: 40px;
+            padding: 30px;
             background: linear-gradient(to bottom, #f5f3f9 0%, #ffffff 50%);
+            overflow-y: auto;
         }
 
-        /* TABS CONTENT */
         .tab-content {
             display: none;
             animation: fadeIn 0.3s ease;
         }
-
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content.active { display: block; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* CARDS & SECTIONS */
+        /* CARTES */
         .card {
             background: white;
             border-radius: 16px;
@@ -203,13 +230,22 @@
             margin-bottom: 25px;
         }
 
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
         .card h3 {
             color: var(--primary-dark);
-            margin-bottom: 20px;
             font-size: 18px;
             display: flex;
             align-items: center;
             gap: 10px;
+            margin: 0;
         }
 
         .card h3::before {
@@ -220,17 +256,19 @@
             border-radius: 2px;
         }
 
-        /* TABLE STYLES */
+        /* TABLEAUX */
         .table-wrapper {
             overflow-x: auto;
             border-radius: 12px;
             border: 1px solid var(--border-color);
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
+            min-width: 600px;
         }
 
         thead tr {
@@ -238,188 +276,173 @@
             color: white;
         }
 
-        th {
-            padding: 16px 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        td {
+        th, td {
             padding: 14px 12px;
+            text-align: left;
             border-bottom: 1px solid var(--border-color);
             font-size: 14px;
         }
 
-        tbody tr:hover {
-            background: var(--accent-lavender);
-            transition: all 0.2s ease;
-        }
+        th { font-weight: 600; }
+        
+        tbody tr:hover { background: var(--accent-lavender); }
 
         .status-badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
+        .status-present { background: rgba(42, 157, 143, 0.15); color: var(--green-accent); }
+        .status-absent { background: rgba(230, 57, 70, 0.15); color: var(--red-accent); }
+        .status-pending { background: rgba(155, 127, 196, 0.15); color: var(--primary-light); }
 
-        .status-present {
-            background: rgba(42, 157, 143, 0.15);
-            color: var(--green-accent);
-        }
-
-        .status-absent {
-            background: rgba(230, 57, 70, 0.15);
-            color: var(--red-accent);
-        }
-
-        .status-pending {
-            background: rgba(155, 127, 196, 0.15);
-            color: var(--primary-light);
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--primary-dark);
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="date"],
-        select,
-        textarea {
+        /* INPUTS & FORMULAIRES */
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; color: var(--primary-dark); font-weight: 600; font-size: 13px; }
+        
+        input, select, textarea {
             width: 100%;
-            padding: 11px 14px;
+            padding: 12px;
             border: 2px solid var(--border-color);
             border-radius: 8px;
             font-family: inherit;
-            font-size: 14px;
-            transition: all 0.3s ease;
+            font-size: 16px;
         }
 
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="tel"]:focus,
-        input[type="date"]:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(107, 79, 160, 0.1);
-        }
-
-        /* GRID LAYOUT */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
+        /* STATS GRIDS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
         .stat-card {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
             color: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 16px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(62, 43, 95, 0.2);
         }
+        .stat-number { font-size: 36px; font-weight: 700; margin: 5px 0; }
+        .stat-label { font-size: 14px; opacity: 0.9; }
 
-        .stat-number {
-            font-size: 42px;
+        /* --- NOUVEAU : STYLE BARRE PROGRESSION --- */
+        .progress-section {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(62, 43, 95, 0.08);
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
             font-weight: 700;
-            margin: 10px 0;
         }
-
-        .stat-label {
-            font-size: 13px;
-            opacity: 0.9;
+        .progress-container {
+            background: #E8DFF5;
+            border-radius: 20px;
+            height: 35px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #E63946, #ff5f6b);
+            height: 100%;
+            width: 0%; /* JS va changer ça */
+            border-radius: 20px;
+            transition: width 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            box-shadow: 2px 0 10px rgba(230, 57, 70, 0.4);
+        }
+        .progress-text {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            white-space: nowrap;
         }
 
         /* MODAL */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 20px;
         }
-
-        .modal.active {
-            display: flex;
-        }
-
+        .modal.active { display: flex; }
+        
         .modal-content {
             background: white;
             border-radius: 16px;
-            padding: 30px;
+            padding: 25px;
+            width: 100%;
             max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
-
         .modal-header {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 20px; font-weight: 700; color: var(--primary-dark);
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
         }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 28px;
-            color: var(--primary-light);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            color: var(--red-accent);
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {
-            .grid-3 { grid-template-columns: 1fr 1fr; }
+        /* --- RESPONSIVE MOBILE --- */
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+            }
+            .sidebar.active { transform: translateX(280px); }
+            .menu-toggle { display: block; }
+            .sidebar-overlay {
+                display: none;
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); z-index: 99;
+            }
+            .sidebar-overlay.active { display: block; }
         }
 
         @media (max-width: 768px) {
-            .container { flex-direction: column; }
-            .sidebar { width: 100%; padding: 20px; display: flex; flex-direction: row; overflow-x: auto; }
-            .nav-menu { flex-direction: row; gap: 5px; flex-wrap: wrap; }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+                padding: 15px;
+            }
+            .header-left { justify-content: space-between; width: 100%; }
+            .header-actions { flex-direction: column; width: 100%; }
+            .header-actions button, .header-actions input, .header-actions div { width: 100% !important; }
+            .content-area { padding: 15px; }
             .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            .header { flex-direction: column; gap: 15px; text-align: center; }
-            .content-area { padding: 20px; }
+            .card { padding: 15px; }
+            .btn { width: 100%; margin-bottom: 5px; }
+            .card-header { flex-direction: column; align-items: stretch; gap: 15px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <div class="sidebar" id="sidebar">
             <div>
                 <div class="logo-section">
                     <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/553616c3-1f4f-49ec-a23d-3e9db473cf4d" alt="ENSEM CIDH">
@@ -427,19 +450,19 @@
                 </div>
             </div>
             <nav class="nav-menu">
-                <div class="nav-item active" onclick="switchTab('donneurs')">
+                <div class="nav-item active" onclick="switchTab('donneurs'); toggleSidebar()">
                     <span class="nav-icon">👥</span>
                     <span>Donneurs</span>
                 </div>
-                <div class="nav-item" onclick="switchTab('comite')">
+                <div class="nav-item" onclick="switchTab('comite'); toggleSidebar()">
                     <span class="nav-icon">📋</span>
                     <span>Comité</span>
                 </div>
-                <div class="nav-item" onclick="switchTab('suivi')">
+                <div class="nav-item" onclick="switchTab('suivi'); toggleSidebar()">
                     <span class="nav-icon">✅</span>
                     <span>Suivi Jour J</span>
                 </div>
-                <div class="nav-item" onclick="switchTab('stats')">
+                <div class="nav-item" onclick="switchTab('stats'); toggleSidebar()">
                     <span class="nav-icon">📊</span>
                     <span>Statistiques</span>
                 </div>
@@ -448,24 +471,29 @@
 
         <div class="main-content">
             <div class="header">
-                <h2 id="page-title">Gestion des Donneurs</h2>
+                <div class="header-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                    <h2 id="page-title">Gestion des Donneurs</h2>
+                </div>
                 <div class="header-actions">
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="text" id="search-input" placeholder="🔍 Rechercher..." style="padding: 12px 16px; border: 2px solid #D9D3E3; border-radius: 10px; width: 250px; font-size: 14px;">
+                    <div style="display: flex; gap: 5px; align-items: center; flex: 1;">
+                        <input type="text" id="search-input" placeholder="🔍 Rechercher..." style="min-width: 200px;">
                     </div>
-                    <input type="file" id="backup-input" accept=".json" style="display: none;" onchange="importJSONBackup(event)">
-                    <button class="btn btn-secondary" onclick="document.getElementById('backup-input').click()">📂 Restaurer Backup</button>
                     
+                    <input type="file" id="backup-input" accept=".json" style="display: none;" onchange="importJSONBackup(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('backup-input').click()">📂 Restaurer</button>
                     <button class="btn btn-secondary" onclick="openModal('export')">📥 Exporter</button>
-                    <button class="btn btn-primary" onclick="openModal('add')">➕ Ajouter Donneur</button>
+                    <button class="btn btn-primary" onclick="openModal('add')">➕ Ajouter</button>
                 </div>
             </div>
 
             <div class="content-area">
                 <div class="tab-content active" id="donneurs">
                     <div class="card">
-                        <h3>Liste des Donneurs Inscrits</h3>
-                        <button class="btn btn-secondary" style="margin-bottom: 15px;" onclick="openModal('import')">📂 Importer Excel</button>
+                        <div class="card-header">
+                            <h3>Liste Complète (Tous)</h3>
+                            <button class="btn btn-secondary" onclick="openModal('import')">📂 Importer Excel</button>
+                        </div>
                         <div class="table-wrapper">
                             <table>
                                 <thead>
@@ -481,8 +509,7 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="donneurs-table">
-                                    </tbody>
+                                <tbody id="donneurs-table"></tbody>
                             </table>
                         </div>
                     </div>
@@ -490,8 +517,8 @@
 
                 <div class="tab-content" id="comite">
                     <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3>Gestion du Comité Organisateur</h3>
+                        <div class="card-header">
+                            <h3>Comité Organisateur</h3>
                             <button class="btn btn-primary" onclick="openModal('add-comite')">➕ Ajouter Membre</button>
                         </div>
                         <div class="table-wrapper">
@@ -506,8 +533,7 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="comite-table">
-                                    </tbody>
+                                <tbody id="comite-table"></tbody>
                             </table>
                         </div>
                     </div>
@@ -516,37 +542,49 @@
                 <div class="tab-content" id="suivi">
                     <div class="grid-2">
                         <div class="stat-card">
-                            <div class="stat-label">Inscrits</div>
+                            <div class="stat-label">Inscrits (Avec N°)</div>
                             <div class="stat-number" id="stat-inscrits">0</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Présents</div>
+                            <div class="stat-label">Présents Confirmés</div>
                             <div class="stat-number" id="stat-presents">0</div>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3>Pointage en Temps Réel</h3>
+                    <div class="card" style="margin-top: 20px;">
+                        <h3>Pointage Temps Réel (Seulement avec N° Prélèvement)</h3>
                         <div class="table-wrapper">
                             <table>
                                 <thead>
                                     <tr>
+                                        <th>N°</th>
                                         <th>Nom</th>
                                         <th>Créneau</th>
                                         <th>État</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="suivi-table">
-                                    </tbody>
+                                <tbody id="suivi-table"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
                 <div class="tab-content" id="stats">
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span>🩸 Objectif Poches</span>
+                            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="changeObjectif()">⚙️ Modifier</button>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progress-fill">
+                                <span class="progress-text" id="progress-label">0 / 200 (0%)</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid-3">
                         <div class="stat-card">
-                            <div class="stat-label">Total Inscrits</div>
+                            <div class="stat-label">Total Inscrits (N°)</div>
                             <div class="stat-number" id="total-inscrits">0</div>
                         </div>
                         <div class="stat-card">
@@ -554,12 +592,12 @@
                             <div class="stat-number" id="total-presents">0</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Taux de Présence</div>
+                            <div class="stat-label">Taux Présence</div>
                             <div class="stat-number" id="taux-presence">0%</div>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3>Distribution par Créneau</h3>
+                    <div class="card" style="margin-top: 20px;">
+                        <h3>Distribution par Créneau (Seulement avec N°)</h3>
                         <div class="table-wrapper">
                             <table>
                                 <thead>
@@ -570,8 +608,7 @@
                                         <th>Absence</th>
                                     </tr>
                                 </thead>
-                                <tbody id="stats-table">
-                                    </tbody>
+                                <tbody id="stats-table"></tbody>
                             </table>
                         </div>
                     </div>
@@ -583,7 +620,7 @@
     <div class="modal" id="modal-add">
         <div class="modal-content">
             <div class="modal-header">
-                ➕ Ajouter Donneur
+                <span>➕ Ajouter Donneur</span>
                 <button class="modal-close" onclick="closeModal('add')">✕</button>
             </div>
             <form onsubmit="addDonneur(event)">
@@ -607,29 +644,30 @@
                 </div>
                 <div class="input-group">
                     <label>N° Prélèvement</label>
-                    <input type="text" id="form-numPrelevement" placeholder="ex: P001">
+                    <input type="text" id="form-numPrelevement" placeholder="Laisser vide si pas encore donné">
                 </div>
-                <div class="input-group">
-                    <label>École</label>
-                    <select id="form-ecole" required>
-                        <option value="">Choisir...</option>
-                        <option value="ENS">ENS</option>
-                        <option value="ENSEM">ENSEM</option>
-                        <option value="ESITH">ESITH</option>
-                        <option value="EHTP">EHTP</option>
-                        <option value="EST">EST</option>
-                        <option value="ISEM">ISEM</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Filière</label>
-                    <input type="text" id="form-filiere" placeholder="ex: Génie Informatique">
+                <div class="grid-2" style="gap: 10px;">
+                    <div class="input-group">
+                        <label>École</label>
+                        <select id="form-ecole" required>
+                            <option value="ENSEM">ENSEM</option>
+                            <option value="ENS">ENS</option>
+                            <option value="ESITH">ESITH</option>
+                            <option value="EHTP">EHTP</option>
+                            <option value="EST">EST</option>
+                            <option value="ISEM">ISEM</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Filière</label>
+                        <input type="text" id="form-filiere" placeholder="ex: G.Info">
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>Remarques</label>
-                    <textarea id="form-remarques" placeholder="Notes supplémentaires..." style="resize: vertical; min-height: 60px;"></textarea>
+                    <textarea id="form-remarques" placeholder="Notes..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Ajouter Donneur</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Ajouter Donneur</button>
             </form>
         </div>
     </div>
@@ -637,147 +675,74 @@
     <div class="modal" id="modal-add-comite">
         <div class="modal-content">
             <div class="modal-header">
-                ➕ Ajouter Membre Comité
+                <span>➕ Ajouter Membre</span>
                 <button class="modal-close" onclick="closeModal('add-comite')">✕</button>
             </div>
             <form onsubmit="addComite(event)">
-                <div class="input-group">
-                    <label>Nom Complet</label>
-                    <input type="text" id="comite-nom" required>
+                <div class="input-group"><label>Nom</label><input type="text" id="comite-nom" required></div>
+                <div class="input-group"><label>Rôle</label><input type="text" id="comite-role" required></div>
+                <div class="input-group"><label>Filière</label><input type="text" id="comite-filiere" required></div>
+                <div class="input-group"><label>Présence</label>
+                    <select id="comite-present"><option value="true">Présent</option><option value="false">Absent</option></select>
                 </div>
-                <div class="input-group">
-                    <label>Rôle</label>
-                    <input type="text" id="comite-role" placeholder="ex: Responsable Logistique" required>
-                </div>
-                <div class="input-group">
-                    <label>Filière</label>
-                    <input type="text" id="comite-filiere" placeholder="ex: G.Info" required>
-                </div>
-                <div class="input-group">
-                    <label>Présence</label>
-                    <select id="comite-present">
-                        <option value="true">Présent</option>
-                        <option value="false">Absent</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Justification (si absent)</label>
-                    <input type="text" id="comite-justif">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Ajouter Membre</button>
+                <div class="input-group"><label>Justification</label><input type="text" id="comite-justif"></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Ajouter</button>
             </form>
         </div>
     </div>
 
     <div class="modal" id="modal-edit-comite">
         <div class="modal-content">
-            <div class="modal-header">
-                ✏️ Modifier Membre
-                <button class="modal-close" onclick="closeModal('edit-comite')">✕</button>
-            </div>
+            <div class="modal-header"><span>✏️ Modifier</span><button class="modal-close" onclick="closeModal('edit-comite')">✕</button></div>
             <form onsubmit="saveComite(event)">
-                <div class="input-group">
-                    <label>Nom Complet</label>
-                    <input type="text" id="edit-comite-nom" required>
+                <div class="input-group"><label>Nom</label><input type="text" id="edit-comite-nom" required></div>
+                <div class="input-group"><label>Rôle</label><input type="text" id="edit-comite-role" required></div>
+                <div class="input-group"><label>Filière</label><input type="text" id="edit-comite-filiere" required></div>
+                <div class="input-group"><label>Présence</label>
+                    <select id="edit-comite-present"><option value="true">Présent</option><option value="false">Absent</option></select>
                 </div>
-                <div class="input-group">
-                    <label>Rôle</label>
-                    <input type="text" id="edit-comite-role" required>
-                </div>
-                <div class="input-group">
-                    <label>Filière</label>
-                    <input type="text" id="edit-comite-filiere" required>
-                </div>
-                <div class="input-group">
-                    <label>Présence</label>
-                    <select id="edit-comite-present">
-                        <option value="true">Présent</option>
-                        <option value="false">Absent</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Justification</label>
-                    <input type="text" id="edit-comite-justif">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Sauvegarder</button>
+                <div class="input-group"><label>Justification</label><input type="text" id="edit-comite-justif"></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sauvegarder</button>
             </form>
         </div>
     </div>
 
     <div class="modal" id="modal-export">
         <div class="modal-content">
-            <div class="modal-header">
-                📥 Exporter les Données
-                <button class="modal-close" onclick="closeModal('export')">✕</button>
-            </div>
-            <p style="margin-bottom: 20px; color: #666;">Choisissez le format d'export pour l'onglet actif :</p>
-            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportCSV()">📊 Exporter en CSV (Donneurs)</button>
-            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportPDF()">📄 Exporter en PDF (Onglet Actif)</button>
-            <button class="btn btn-secondary" style="width: 100%;" onclick="exportJSON()">📋 Sauvegarder tout en JSON</button>
+            <div class="modal-header"><span>📥 Exporter</span><button class="modal-close" onclick="closeModal('export')">✕</button></div>
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportCSV()">📊 CSV (Donneurs)</button>
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportPDF()">📄 PDF (Onglet Actif)</button>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="exportJSON()">📋 Sauvegarde Complète (JSON)</button>
         </div>
     </div>
 
     <div class="modal" id="modal-import">
         <div class="modal-content">
-            <div class="modal-header">
-                📂 Importer Donneurs (Excel)
-                <button class="modal-close" onclick="closeModal('import')">✕</button>
-            </div>
-            <p style="margin-bottom: 20px; color: #666;">Sélectionnez un fichier Excel (.xlsx, .xls) ou CSV</p>
-            <input type="file" id="import-file" accept=".xlsx,.xls,.csv" style="margin-bottom: 20px; padding: 10px; border: 2px dashed #D9D3E3; border-radius: 8px; width: 100%; cursor: pointer;">
-            <button class="btn btn-primary" style="width: 100%;" onclick="importExcel()">📥 Importer</button>
+            <div class="modal-header"><span>📂 Importer Excel</span><button class="modal-close" onclick="closeModal('import')">✕</button></div>
+            <input type="file" id="import-file" accept=".xlsx,.xls,.csv" style="margin-bottom: 20px; width: 100%;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="importExcel()">Importer</button>
         </div>
     </div>
 
     <div class="modal" id="modal-edit">
         <div class="modal-content">
-            <div class="modal-header">
-                ✏️ Modifier Donneur
-                <button class="modal-close" onclick="closeModal('edit')">✕</button>
-            </div>
+            <div class="modal-header"><span>✏️ Modifier Donneur</span><button class="modal-close" onclick="closeModal('edit')">✕</button></div>
             <form onsubmit="saveDonneur(event)">
-                <div class="input-group">
-                    <label>Nom Complet</label>
-                    <input type="text" id="edit-nom" required>
-                </div>
-                <div class="input-group">
-                    <label>Téléphone</label>
-                    <input type="tel" id="edit-tel" required>
-                </div>
-                <div class="input-group">
-                    <label>Créneau</label>
+                <div class="input-group"><label>Nom</label><input type="text" id="edit-nom" required></div>
+                <div class="input-group"><label>Tel</label><input type="tel" id="edit-tel" required></div>
+                <div class="input-group"><label>Créneau</label>
                     <select id="edit-creneau" required>
-                        <option value="09h00 – 10h00">09h00 – 10h00</option>
-                        <option value="10h00 – 11h00">10h00 – 11h00</option>
-                        <option value="11h00 – 12h00">11h00 – 12h00</option>
-                        <option value="12h00 - 13h00">12h00 - 13h00</option>
+                        <option value="09h00 – 10h00">09h00 – 10h00</option><option value="10h00 – 11h00">10h00 – 11h00</option>
+                        <option value="11h00 – 12h00">11h00 – 12h00</option><option value="12h00 - 13h00">12h00 - 13h00</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label>N° Prélèvement</label>
-                    <input type="text" id="edit-numPrelevement" placeholder="ex: P001">
+                <div class="input-group"><label>N° Prélèvement</label><input type="text" id="edit-numPrelevement" placeholder="P001"></div>
+                <div class="grid-2" style="gap:10px">
+                    <div class="input-group"><label>École</label><select id="edit-ecole" required><option value="ENSEM">ENSEM</option><option value="ENS">ENS</option><option value="ESITH">ESITH</option><option value="EHTP">EHTP</option><option value="EST">EST</option><option value="ISEM">ISEM</option></select></div>
+                    <div class="input-group"><label>Filière</label><input type="text" id="edit-filiere"></div>
                 </div>
-                <div class="input-group">
-                    <label>École</label>
-                    <select id="edit-ecole" required>
-                        <option value="">Choisir...</option>
-                        <option value="ENS">ENS</option>
-                        <option value="ENSEM">ENSEM</option>
-                        <option value="ESITH">ESITH</option>
-                        <option value="EHTP">EHTP</option>
-                        <option value="EST">EST</option>
-                        <option value="ISEM">ISEM</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Filière</label>
-                    <input type="text" id="edit-filiere" placeholder="ex: Génie Informatique">
-                </div>
-                <div class="input-group">
-                    <label>Remarques</label>
-                    <textarea id="edit-remarques" placeholder="Notes supplémentaires..." style="resize: vertical; min-height: 60px;"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Modifier</button>
+                <div class="input-group"><label>Remarques</label><textarea id="edit-remarques"></textarea></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sauvegarder</button>
             </form>
         </div>
     </div>
@@ -785,20 +750,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        // DONNÉES (simulées)
+        // DONNEES INITIALES (Exemple)
         let donneurs = [
-            { id: 1, nom: "Ahmed Ben Ali", tel: "0612345678", creneau: "09h00 – 10h00", numPrelevement: "P001", ecole: "ENSEM", filiere: "Génie Informatique", remarques: "", status: "present" },
-            { id: 2, nom: "Fatima Zahra", tel: "0687654321", creneau: "10h00 – 11h00", numPrelevement: "P002", ecole: "ESITH", filiere: "Génie Civil", remarques: "Allergie connue", status: "present" },
-            { id: 3, nom: "Mohamed Hassan", tel: "0698765432", creneau: "11h00 – 12h00", numPrelevement: "", ecole: "EHTP", filiere: "Management", remarques: "", status: "absent" },
+            { id: 1, nom: "Exemple Sans N°", tel: "0600000000", creneau: "09h00 – 10h00", numPrelevement: "", ecole: "ENSEM", filiere: "G.Info", remarques: "", status: "absent" },
+            { id: 2, nom: "Exemple Avec N°", tel: "0600000001", creneau: "09h00 – 10h00", numPrelevement: "P001", ecole: "ENSEM", filiere: "G.Indus", remarques: "", status: "present" }
         ];
-
         let comite = [
-            { id: 1, nom: "Karim Ameziane", role: "Responsable", filiere: "G.Info", present: true, justification: "" },
-            { id: 2, nom: "Layla Bennani", role: "Infirmière", filiere: "Médical", present: true, justification: "" },
-            { id: 3, nom: "Omar Siddiq", role: "Coordinateur", filiere: "G.Indus", present: false, justification: "Urgence familiale" },
+            { id: 1, nom: "Responsable", role: "Chef Projet", filiere: "G.Info", present: true, justification: "" }
         ];
+        let editingId = null;
+        let editingComiteId = null;
+        let objectif = 200; // OBJECTIF PAR DEFAUT
 
-        // FONCTIONS
+        // RESPONSIVE
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+
+        // NAVIGATION
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
@@ -806,12 +776,7 @@
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             event.target.closest('.nav-item').classList.add('active');
 
-            const titles = {
-                donneurs: 'Gestion des Donneurs',
-                comite: 'Gestion du Comité',
-                suivi: 'Suivi Jour J',
-                stats: 'Statistiques'
-            };
+            const titles = { donneurs: 'Donneurs', comite: 'Comité', suivi: 'Suivi Jour J', stats: 'Statistiques' };
             document.getElementById('page-title').textContent = titles[tabName];
 
             if (tabName === 'donneurs') renderDonneurs();
@@ -820,10 +785,12 @@
             if (tabName === 'stats') renderStats();
         }
 
-        let editingId = null;
-        let editingComiteId = null;
+        // UTILS
+        function hasNum(d) {
+            return d.numPrelevement && d.numPrelevement.toString().trim() !== '';
+        }
 
-        // --- GESTION DONNEURS ---
+        // RENDU DONNEURS
         function renderDonneurs() {
             const tbody = document.getElementById('donneurs-table');
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
@@ -835,21 +802,20 @@
                     <td><strong>${d.nom}</strong></td>
                     <td>${d.tel}</td>
                     <td>${d.creneau}</td>
-                    <td>${d.numPrelevement || '-'}</td>
+                    <td><span style="font-weight:bold; color:${hasNum(d)?'var(--primary-dark)':'#ccc'}">${d.numPrelevement || 'Aucun'}</span></td>
                     <td>${d.ecole}</td>
                     <td>${d.filiere}</td>
-                    <td><span class="status-badge status-${d.status}">${d.status === 'present' ? 'Présent' : d.status === 'absent' ? 'Absent' : 'En attente'}</span></td>
+                    <td><span class="status-badge status-${d.status}">${d.status === 'present' ? 'Présent' : 'Absent'}</span></td>
                     <td>
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editDonneur(${d.id})">✏️</button>
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="deleteDonneur(${d.id})" style="background: rgba(230, 57, 70, 0.1); color: #E63946;">🗑️</button>
+                        <button class="btn btn-secondary" style="padding:5px 8px;" onclick="editDonneur(${d.id})">✏️</button>
+                        <button class="btn btn-secondary" style="padding:5px 8px; color:red;" onclick="deleteDonneur(${d.id})">🗑️</button>
                     </td>
                 </tr>
             `).join('');
         }
-
         document.getElementById('search-input').addEventListener('keyup', renderDonneurs);
 
-        // --- GESTION COMITÉ ---
+        // RENDU COMITE
         function renderComite() {
             const tbody = document.getElementById('comite-table');
             tbody.innerHTML = comite.map(c => `
@@ -860,133 +826,107 @@
                     <td><span class="status-badge ${c.present ? 'status-present' : 'status-absent'}">${c.present ? 'Présent' : 'Absent'}</span></td>
                     <td>${c.justification || '-'}</td>
                     <td>
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editComite(${c.id})">✏️</button>
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="deleteComite(${c.id})" style="background: rgba(230, 57, 70, 0.1); color: #E63946;">🗑️</button>
+                        <button class="btn btn-secondary" style="padding:5px 8px;" onclick="editComite(${c.id})">✏️</button>
+                        <button class="btn btn-secondary" style="padding:5px 8px; color:red;" onclick="deleteComite(${c.id})">🗑️</button>
                     </td>
                 </tr>
             `).join('');
         }
 
+        // SUIVI JOUR J
+        function renderSuivi() {
+            const validDonneurs = donneurs.filter(hasNum);
+            const stats = { presents: validDonneurs.filter(d=>d.status==='present').length };
+            
+            document.getElementById('stat-inscrits').textContent = validDonneurs.length;
+            document.getElementById('stat-presents').textContent = stats.presents;
+            
+            const sorted = validDonneurs.sort((a,b) => a.creneau.localeCompare(b.creneau));
+            document.getElementById('suivi-table').innerHTML = sorted.map(d => `
+                <tr>
+                    <td><strong>${d.numPrelevement}</strong></td>
+                    <td>${d.nom}</td>
+                    <td>${d.creneau}</td>
+                    <td><span class="status-badge status-${d.status}">${d.status === 'present' ? '✓ Présent' : '✗ Absent'}</span></td>
+                    <td><button class="btn btn-secondary" onclick="toggleStatus(${d.id})">${d.status === 'present' ? 'Marquer Absent' : 'Marquer Présent'}</button></td>
+                </tr>`).join('');
+        }
+        function toggleStatus(id) {
+            const d = donneurs.find(x => x.id === id);
+            if(d) { d.status = d.status === 'present' ? 'absent' : 'present'; renderSuivi(); }
+        }
+
+        // STATISTIQUES (AVEC BARRE PROGRESSION)
+        function changeObjectif() {
+            const newObj = prompt("Quel est l'objectif de poches ?", objectif);
+            if(newObj && !isNaN(newObj)) { objectif = parseInt(newObj); renderStats(); }
+        }
+
+        function renderStats() {
+            const validDonneurs = donneurs.filter(hasNum);
+            const p = validDonneurs.filter(d=>d.status==='present').length;
+            
+            document.getElementById('total-inscrits').textContent = validDonneurs.length;
+            document.getElementById('total-presents').textContent = p;
+            document.getElementById('taux-presence').textContent = validDonneurs.length ? Math.round((p/validDonneurs.length)*100)+'%' : '0%';
+            
+            // Mise à jour Barre
+            const percentage = Math.min(Math.round((p / objectif) * 100), 100);
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-label').textContent = `${p} / ${objectif} Poches (${percentage}%)`;
+
+            const cr = {};
+            validDonneurs.forEach(d => {
+                if(!cr[d.creneau]) cr[d.creneau] = {t:0, p:0, a:0};
+                cr[d.creneau].t++;
+                d.status==='present' ? cr[d.creneau].p++ : cr[d.creneau].a++;
+            });
+            document.getElementById('stats-table').innerHTML = Object.entries(cr).map(([k,v]) => `
+                <tr><td><strong>${k}</strong></td><td>${v.t}</td><td><span class="status-badge status-present">${v.p}</span></td><td><span class="status-badge status-absent">${v.a}</span></td></tr>
+            `).join('');
+        }
+
+        // LOGIQUES AJOUT / MODIF
         function addComite(e) {
             e.preventDefault();
-            const nouveau = {
+            comite.push({
                 id: Math.max(...comite.map(c => c.id || 0), 0) + 1,
                 nom: document.getElementById('comite-nom').value,
                 role: document.getElementById('comite-role').value,
                 filiere: document.getElementById('comite-filiere').value,
                 present: document.getElementById('comite-present').value === 'true',
                 justification: document.getElementById('comite-justif').value
-            };
-            comite.push(nouveau);
-            closeModal('add-comite');
-            e.target.reset();
-            renderComite();
+            });
+            closeModal('add-comite'); e.target.reset(); renderComite();
         }
 
         function editComite(id) {
-            editingComiteId = id;
-            const membre = comite.find(c => c.id === id);
-            if (membre) {
-                document.getElementById('edit-comite-nom').value = membre.nom;
-                document.getElementById('edit-comite-role').value = membre.role;
-                document.getElementById('edit-comite-filiere').value = membre.filiere || '';
-                document.getElementById('edit-comite-present').value = membre.present;
-                document.getElementById('edit-comite-justif').value = membre.justification;
+            editingComiteId = id; const m = comite.find(c => c.id === id);
+            if (m) {
+                document.getElementById('edit-comite-nom').value = m.nom;
+                document.getElementById('edit-comite-role').value = m.role;
+                document.getElementById('edit-comite-filiere').value = m.filiere;
+                document.getElementById('edit-comite-present').value = m.present;
+                document.getElementById('edit-comite-justif').value = m.justification;
                 openModal('edit-comite');
             }
         }
-
         function saveComite(e) {
-            e.preventDefault();
-            const membre = comite.find(c => c.id === editingComiteId);
-            if (membre) {
-                membre.nom = document.getElementById('edit-comite-nom').value;
-                membre.role = document.getElementById('edit-comite-role').value;
-                membre.filiere = document.getElementById('edit-comite-filiere').value;
-                membre.present = document.getElementById('edit-comite-present').value === 'true';
-                membre.justification = document.getElementById('edit-comite-justif').value;
-                closeModal('edit-comite');
-                renderComite();
+            e.preventDefault(); const m = comite.find(c => c.id === editingComiteId);
+            if (m) {
+                m.nom = document.getElementById('edit-comite-nom').value;
+                m.role = document.getElementById('edit-comite-role').value;
+                m.filiere = document.getElementById('edit-comite-filiere').value;
+                m.present = document.getElementById('edit-comite-present').value === 'true';
+                m.justification = document.getElementById('edit-comite-justif').value;
+                closeModal('edit-comite'); renderComite();
             }
         }
-
-        function deleteComite(id) {
-            if (confirm('Supprimer ce membre du comité ?')) {
-                comite = comite.filter(c => c.id !== id);
-                renderComite();
-            }
-        }
-
-        // --- GESTION SUIVI & STATS ---
-        function renderSuivi() {
-            const tbody = document.getElementById('suivi-table');
-            const stats = calculateStats();
-            document.getElementById('stat-inscrits').textContent = donneurs.length;
-            document.getElementById('stat-presents').textContent = stats.presents;
-
-            tbody.innerHTML = donneurs.map((d, i) => `
-                <tr>
-                    <td><strong>${d.nom}</strong></td>
-                    <td>${d.creneau}</td>
-                    <td><span class="status-badge status-${d.status}">${d.status === 'present' ? '✓ Présent' : '✗ Absent'}</span></td>
-                    <td>
-                        <button class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" 
-                            onclick="toggleStatus(${d.id})">
-                            ${d.status === 'present' ? 'Marquer absent' : 'Marquer présent'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderStats() {
-            const stats = calculateStats();
-            const creneaux = groupByCreneaux();
-
-            document.getElementById('total-inscrits').textContent = donneurs.length;
-            document.getElementById('total-presents').textContent = stats.presents;
-            document.getElementById('taux-presence').textContent = Math.round((stats.presents / donneurs.length) * 100) + '%';
-
-            const tbody = document.getElementById('stats-table');
-            tbody.innerHTML = Object.entries(creneaux).map(([creneau, data]) => `
-                <tr>
-                    <td><strong>${creneau}</strong></td>
-                    <td>${data.total}</td>
-                    <td><span class="status-badge status-present">${data.presents}</span></td>
-                    <td><span class="status-badge status-absent">${data.absents}</span></td>
-                </tr>
-            `).join('');
-        }
-
-        function calculateStats() {
-            return {
-                presents: donneurs.filter(d => d.status === 'present').length,
-                absents: donneurs.filter(d => d.status === 'absent').length
-            };
-        }
-
-        function groupByCreneaux() {
-            const result = {};
-            donneurs.forEach(d => {
-                if (!result[d.creneau]) result[d.creneau] = { total: 0, presents: 0, absents: 0 };
-                result[d.creneau].total++;
-                if (d.status === 'present') result[d.creneau].presents++;
-                else result[d.creneau].absents++;
-            });
-            return result;
-        }
-
-        function toggleStatus(id) {
-            const donneur = donneurs.find(d => d.id === id);
-            if (donneur) {
-                donneur.status = donneur.status === 'present' ? 'absent' : 'present';
-                renderSuivi();
-            }
-        }
+        function deleteComite(id) { if(confirm('Supprimer ?')) { comite = comite.filter(c => c.id !== id); renderComite(); } }
 
         function addDonneur(e) {
             e.preventDefault();
-            const nouveau = {
+            donneurs.push({
                 id: Math.max(...donneurs.map(d => d.id), 0) + 1,
                 nom: document.getElementById('form-nom').value,
                 tel: document.getElementById('form-tel').value,
@@ -995,293 +935,138 @@
                 ecole: document.getElementById('form-ecole').value,
                 filiere: document.getElementById('form-filiere').value,
                 remarques: document.getElementById('form-remarques').value,
-                status: 'absent' 
-            };
-            donneurs.push(nouveau);
-            closeModal('add');
-            e.target.reset();
-            renderDonneurs();
-        }
-
-        function openModal(type) {
-            document.getElementById('modal-' + type).classList.add('active');
-        }
-
-        function closeModal(type) {
-            document.getElementById('modal-' + type).classList.remove('active');
-        }
-
-        // --- EXPORT / IMPORT ---
-
-        function exportCSV() {
-            const filtered = donneurs.filter(d => d.numPrelevement && d.status === 'present' && d.ecole === 'ENSEM');
-            const headers = ['Nom Complet', 'N° Prélèvement', 'Filière'];
-            const rows = filtered.map(d => [d.nom, d.numPrelevement, d.filiere]);
-            const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-            
-            const blob = new Blob([csv], { type: 'text/csv; charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'donneurs_ENSEM_' + new Date().getTime() + '.csv';
-            a.click();
-            closeModal('export');
-        }
-
-        function exportJSON() {
-            const json = JSON.stringify({ donneurs, comite }, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'backup_don_sang_' + new Date().getTime() + '.json';
-            a.click();
-            closeModal('export');
-        }
-
-        function importJSONBackup(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.donneurs) donneurs = data.donneurs;
-                    if (data.comite) comite = data.comite;
-                    
-                    alert("✅ Données restaurées avec succès !");
-                    // Rafraîchir toutes les vues
-                    const activeTab = document.querySelector('.tab-content.active').id;
-                    if (activeTab === 'donneurs') renderDonneurs();
-                    if (activeTab === 'comite') renderComite();
-                    if (activeTab === 'suivi') renderSuivi();
-                    if (activeTab === 'stats') renderStats();
-                } catch (error) {
-                    alert("Erreur: Fichier JSON invalide.");
-                }
-            };
-            reader.readAsText(file);
+                status: 'absent'
+            });
+            closeModal('add'); e.target.reset(); renderDonneurs();
         }
 
         function editDonneur(id) {
-            editingId = id;
-            const donneur = donneurs.find(d => d.id === id);
-            if (donneur) {
-                document.getElementById('edit-nom').value = donneur.nom;
-                document.getElementById('edit-tel').value = donneur.tel;
-                document.getElementById('edit-creneau').value = donneur.creneau;
-                document.getElementById('edit-numPrelevement').value = donneur.numPrelevement;
-                document.getElementById('edit-ecole').value = donneur.ecole;
-                document.getElementById('edit-filiere').value = donneur.filiere;
-                document.getElementById('edit-remarques').value = donneur.remarques;
+            editingId = id; const d = donneurs.find(x => x.id === id);
+            if (d) {
+                document.getElementById('edit-nom').value = d.nom;
+                document.getElementById('edit-tel').value = d.tel;
+                document.getElementById('edit-creneau').value = d.creneau;
+                document.getElementById('edit-numPrelevement').value = d.numPrelevement;
+                document.getElementById('edit-ecole').value = d.ecole;
+                document.getElementById('edit-filiere').value = d.filiere;
+                document.getElementById('edit-remarques').value = d.remarques;
                 openModal('edit');
             }
         }
-
         function saveDonneur(e) {
-            e.preventDefault();
-            const donneur = donneurs.find(d => d.id === editingId);
-            if (donneur) {
-                donneur.nom = document.getElementById('edit-nom').value;
-                donneur.tel = document.getElementById('edit-tel').value;
-                donneur.creneau = document.getElementById('edit-creneau').value;
-                donneur.numPrelevement = document.getElementById('edit-numPrelevement').value;
-                donneur.ecole = document.getElementById('edit-ecole').value;
-                donneur.filiere = document.getElementById('edit-filiere').value;
-                donneur.remarques = document.getElementById('edit-remarques').value;
-                closeModal('edit');
-                renderDonneurs();
+            e.preventDefault(); const d = donneurs.find(x => x.id === editingId);
+            if (d) {
+                d.nom = document.getElementById('edit-nom').value;
+                d.tel = document.getElementById('edit-tel').value;
+                d.creneau = document.getElementById('edit-creneau').value;
+                d.numPrelevement = document.getElementById('edit-numPrelevement').value;
+                d.ecole = document.getElementById('edit-ecole').value;
+                d.filiere = document.getElementById('edit-filiere').value;
+                d.remarques = document.getElementById('edit-remarques').value;
+                closeModal('edit'); renderDonneurs();
             }
         }
+        function deleteDonneur(id) { if(confirm('Supprimer ?')) { donneurs = donneurs.filter(d => d.id !== id); renderDonneurs(); } }
 
-        function deleteDonneur(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce donneur?')) {
-                donneurs = donneurs.filter(d => d.id !== id);
-                renderDonneurs();
-            }
-        }
+        // IMPORTS / EXPORTS
+        function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
+        function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); }
 
         function importExcel() {
             const file = document.getElementById('import-file').files[0];
-            if (!file) {
-                alert('Veuillez sélectionner un fichier (Excel ou CSV).');
-                return;
-            }
-
+            if (!file) return alert('Sélectionnez un fichier');
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
+                    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                     let count = 0;
                     jsonData.forEach(row => {
-                        let cleanRow = {};
-                        Object.keys(row).forEach(key => {
-                            cleanRow[key.trim()] = row[key];
-                        });
-
-                        if (cleanRow['Nom'] || cleanRow['Nom Complet']) {
+                        let clean = {}; Object.keys(row).forEach(k => clean[k.trim()] = row[k]);
+                        if(clean['Nom'] || clean['Nom Complet']) {
                             donneurs.push({
-                                id: Math.max(...donneurs.map(d => d.id), 0) + 1,
-                                nom: cleanRow['Nom'] || cleanRow['Nom Complet'] || 'Inconnu',
-                                tel: cleanRow['Téléphone'] || cleanRow['Tel'] || cleanRow['Phone'] || '', 
-                                creneau: cleanRow['Créneau'] || '09h00 – 10h00',
-                                numPrelevement: '', 
-                                ecole: 'ENSEM', 
-                                filiere: '',
-                                remarques: '',
-                                status: 'absent' 
+                                id: Math.max(...donneurs.map(d=>d.id),0)+1,
+                                nom: clean['Nom']||clean['Nom Complet']||'Inconnu',
+                                tel: clean['Téléphone']||clean['Tel']||'',
+                                creneau: clean['Créneau']||'09h00 – 10h00',
+                                numPrelevement: '', ecole: 'ENSEM', filiere: '', remarques: '', status: 'absent'
                             });
                             count++;
                         }
                     });
-
-                    closeModal('import');
-                    document.getElementById('import-file').value = ''; 
-                    
-                    if (count > 0) {
-                        alert(`Succès ! ${count} donneurs ont été importés.`);
-                    } else {
-                        alert("Aucune donnée valide trouvée.");
-                    }
-                    
-                    renderDonneurs();
-                    renderSuivi();
-                    renderStats();
-                    
-                } catch (error) {
-                    console.error(error);
-                    alert('Erreur lors de la lecture du fichier.');
-                }
+                    alert(count + ' importés !'); closeModal('import'); document.getElementById('import-file').value='';
+                    renderDonneurs(); renderSuivi(); renderStats();
+                } catch(err) { alert('Erreur lecture fichier'); }
             };
             reader.readAsArrayBuffer(file);
         }
 
+        function exportJSON() {
+            const blob = new Blob([JSON.stringify({donneurs, comite})], {type:'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'backup_donsang_'+Date.now()+'.json'; a.click(); closeModal('export');
+        }
+
+        function importJSONBackup(e) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    const d = JSON.parse(ev.target.result);
+                    if(d.donneurs) donneurs = d.donneurs;
+                    if(d.comite) comite = d.comite;
+                    alert('Restauration réussie !');
+                    const act = document.querySelector('.tab-content.active').id;
+                    if(act==='donneurs') renderDonneurs();
+                    if(act==='comite') renderComite();
+                    if(act==='suivi') renderSuivi();
+                    if(act==='stats') renderStats();
+                } catch(er) { alert('Fichier invalide'); }
+            };
+            if(e.target.files[0]) reader.readAsText(e.target.files[0]);
+        }
+        
+        function exportCSV() {
+            const d = donneurs.filter(x => hasNum(x) && x.status === 'present' && x.ecole === 'ENSEM');
+            const csv = ['Nom,Prelevement,Filiere', ...d.map(x => `${x.nom},${x.numPrelevement},${x.filiere}`)].join('\n');
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+            a.download = 'donneurs_ensem.csv'; a.click(); closeModal('export');
+        }
+
         function exportPDF() {
-            const activeTabId = document.querySelector('.tab-content.active').id;
+            const tab = document.querySelector('.tab-content.active').id;
+            let title="", sub="", head="", body="", count=0;
             
-            let title = "";
-            let subTitle = "";
-            let tableHeader = "";
-            let tableBody = "";
-            let dataCount = 0;
-
-            if (activeTabId === 'comite') {
-                title = "MEMBRES DU COMITÉ D'ORGANISATION";
-                subTitle = "Liste de présence et rôles";
-                dataCount = comite.length;
-                
-                tableHeader = `
-                    <tr>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Nom</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Rôle</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Filière</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Présence</th>
-                    </tr>`;
-                    
-                tableBody = comite.map((c, i) => `
-                    <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
-                        <td style="padding: 10px; border: 1px solid #ddd;"><strong>${c.nom}</strong></td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${c.role}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${c.filiere || '-'}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; color: ${c.present ? '#2A9D8F' : '#E63946'}">
-                            ${c.present ? 'Présent' : 'Absent'}
-                        </td>
-                    </tr>
-                `).join('');
-
-            } else if (activeTabId === 'suivi') {
-                title = "FEUILLE DE POINTAGE - SUIVI JOUR J";
-                subTitle = "État en temps réel des inscrits";
-                dataCount = donneurs.length;
-                
-                tableHeader = `
-                    <tr>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Heure</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Nom du Donneur</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">État</th>
-                    </tr>`;
-                
-                const sortedDonneurs = [...donneurs].sort((a,b) => a.creneau.localeCompare(b.creneau));
-                
-                tableBody = sortedDonneurs.map((d, i) => `
-                    <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
-                        <td style="padding: 10px; border: 1px solid #ddd;">${d.creneau}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;"><strong>${d.nom}</strong></td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">
-                            <span style="padding: 4px 8px; border-radius: 4px; background: ${d.status === 'present' ? '#D4EDDA' : '#F8D7DA'}; color: ${d.status === 'present' ? '#155724' : '#721c24'};">
-                                ${d.status === 'present' ? 'PRÉSENT' : 'ABSENT'}
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
-
+            if(tab === 'comite') {
+                const list = comite.filter(c => c.present);
+                title = "MEMBRES DU COMITÉ D'ORGANISATION"; sub = "Liste officielle des présents"; count = list.length;
+                head = `<tr><th style="border:1px solid #ddd;padding:10px">Nom</th><th style="border:1px solid #ddd;padding:10px">Rôle</th><th style="border:1px solid #ddd;padding:10px">Filière</th></tr>`;
+                body = list.map(c => `<tr><td style="border:1px solid #ddd;padding:10px">${c.nom}</td><td style="border:1px solid #ddd;padding:10px">${c.role}</td><td style="border:1px solid #ddd;padding:10px">${c.filiere||'-'}</td></tr>`).join('');
+            } else if (tab === 'suivi') {
+                const list = donneurs.filter(hasNum); 
+                title = "FEUILLE DE POINTAGE"; sub = "État des donneurs avec N° Prélèvement"; count = list.length;
+                head = `<tr><th style="border:1px solid #ddd;padding:10px">N°</th><th style="border:1px solid #ddd;padding:10px">Nom</th><th style="border:1px solid #ddd;padding:10px">État</th></tr>`;
+                body = list.sort((a,b)=>a.creneau.localeCompare(b.creneau)).map(d => `<tr><td style="border:1px solid #ddd;padding:10px">${d.numPrelevement}</td><td style="border:1px solid #ddd;padding:10px">${d.nom}</td><td style="border:1px solid #ddd;padding:10px;color:${d.status==='present'?'green':'red'}">${d.status.toUpperCase()}</td></tr>`).join('');
             } else {
-                const filtered = donneurs.filter(d => d.numPrelevement && d.status === 'present' && d.ecole === 'ENSEM');
-                title = "RAPPORT OFFICIEL DES DONNEURS (ENSEM)";
-                subTitle = "Donneurs confirmés avec N° Prélèvement";
-                dataCount = filtered.length;
-                
-                tableHeader = `
-                    <tr>
-                        <th style="padding: 12px; border: 1px solid #ddd;">#</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Nom Complet</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">N° Prélèvement</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Filière</th>
-                    </tr>`;
-                    
-                tableBody = filtered.map((d, i) => `
-                    <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
-                        <td style="padding: 10px; border: 1px solid #ddd;">${i + 1}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;"><strong>${d.nom}</strong></td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${d.numPrelevement}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${d.filiere}</td>
-                    </tr>
-                `).join('');
+                const list = donneurs.filter(d => hasNum(d) && d.status === 'present' && d.ecole === 'ENSEM');
+                title = "RAPPORT DONNEURS ENSEM"; sub = "Confirmés avec prélèvement"; count = list.length;
+                head = `<tr><th style="border:1px solid #ddd;padding:10px">Nom</th><th style="border:1px solid #ddd;padding:10px">N° Prélèvement</th><th style="border:1px solid #ddd;padding:10px">Filière</th></tr>`;
+                body = list.map(d => `<tr><td style="border:1px solid #ddd;padding:10px">${d.nom}</td><td style="border:1px solid #ddd;padding:10px">${d.numPrelevement}</td><td style="border:1px solid #ddd;padding:10px">${d.filiere}</td></tr>`).join('');
             }
 
-            const element = document.createElement('div');
-            element.style.padding = '20px';
-            element.style.fontFamily = 'Arial, sans-serif';
+            const el = document.createElement('div');
+            el.innerHTML = `
+                <div style="text-align:center;padding:20px;font-family:Arial;">
+                    <h1 style="color:#3E2B5F;margin:0;">ENSEM ELKHIR</h1>
+                    <h3 style="margin:5px 0;">${title}</h3>
+                    <p>${sub}</p>
+                    <p style="text-align:right">Total: ${count}</p>
+                    <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:12px;">
+                        <thead style="background:#3E2B5F;color:white;">${head}</thead><tbody>${body}</tbody>
+                    </table>
+                    <p style="margin-top:30px;font-size:10px;color:#999">Généré le ${new Date().toLocaleString()}</p>
+                </div>`;
             
-            element.innerHTML = `
-                <div style="background: linear-gradient(135deg, #3E2B5F 0%, #6B4FA0 100%); color: white; padding: 25px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
-                    <h1 style="margin: 0; font-size: 24px; font-weight: bold;">🩸 CARAVANE ENSEM CIDH</h1>
-                    <h2 style="margin: 5px 0 0 0; font-size: 16px; font-weight: normal;">${title}</h2>
-                    <p style="margin: 10px 0 0 0; font-size: 12px;">${subTitle}</p>
-                </div>
-                
-                <div style="text-align: right; margin-bottom: 10px; color: #666;">
-                    <strong>Total entrées :</strong> ${dataCount}
-                </div>
-
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px;">
-                    <thead style="background: #3E2B5F; color: white;">
-                        ${tableHeader}
-                    </thead>
-                    <tbody>
-                        ${tableBody}
-                    </tbody>
-                </table>
-
-                <div style="text-align: center; color: #999; font-size: 10px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 10px;">
-                    Généré le ${new Date().toLocaleString('fr-FR')}
-                </div>
-            `;
-
-            const opt = {
-                margin: 10,
-                filename: `export_${activeTabId}_${new Date().getTime()}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-            };
-
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set({ margin:10, filename:`export_${tab}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4'} }).from(el).save();
             closeModal('export');
         }
 
