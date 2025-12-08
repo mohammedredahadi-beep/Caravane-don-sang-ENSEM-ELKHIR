@@ -453,8 +453,11 @@
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="text" id="search-input" placeholder="🔍 Rechercher..." style="padding: 12px 16px; border: 2px solid #D9D3E3; border-radius: 10px; width: 250px; font-size: 14px;">
                     </div>
+                    <input type="file" id="backup-input" accept=".json" style="display: none;" onchange="importJSONBackup(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('backup-input').click()">📂 Restaurer Backup</button>
+                    
                     <button class="btn btn-secondary" onclick="openModal('export')">📥 Exporter</button>
-                    <button class="btn btn-primary" onclick="openModal('add')">➕ Ajouter</button>
+                    <button class="btn btn-primary" onclick="openModal('add')">➕ Ajouter Donneur</button>
                 </div>
             </div>
 
@@ -487,13 +490,17 @@
 
                 <div class="tab-content" id="comite">
                     <div class="card">
-                        <h3>Gestion du Comité Organisateur</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3>Gestion du Comité Organisateur</h3>
+                            <button class="btn btn-primary" onclick="openModal('add-comite')">➕ Ajouter Membre</button>
+                        </div>
                         <div class="table-wrapper">
                             <table>
                                 <thead>
                                     <tr>
                                         <th>Nom</th>
                                         <th>Rôle</th>
+                                        <th>Filière</th>
                                         <th>Présence</th>
                                         <th>Justification</th>
                                         <th>Actions</th>
@@ -627,6 +634,76 @@
         </div>
     </div>
 
+    <div class="modal" id="modal-add-comite">
+        <div class="modal-content">
+            <div class="modal-header">
+                ➕ Ajouter Membre Comité
+                <button class="modal-close" onclick="closeModal('add-comite')">✕</button>
+            </div>
+            <form onsubmit="addComite(event)">
+                <div class="input-group">
+                    <label>Nom Complet</label>
+                    <input type="text" id="comite-nom" required>
+                </div>
+                <div class="input-group">
+                    <label>Rôle</label>
+                    <input type="text" id="comite-role" placeholder="ex: Responsable Logistique" required>
+                </div>
+                <div class="input-group">
+                    <label>Filière</label>
+                    <input type="text" id="comite-filiere" placeholder="ex: G.Info" required>
+                </div>
+                <div class="input-group">
+                    <label>Présence</label>
+                    <select id="comite-present">
+                        <option value="true">Présent</option>
+                        <option value="false">Absent</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Justification (si absent)</label>
+                    <input type="text" id="comite-justif">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Ajouter Membre</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-edit-comite">
+        <div class="modal-content">
+            <div class="modal-header">
+                ✏️ Modifier Membre
+                <button class="modal-close" onclick="closeModal('edit-comite')">✕</button>
+            </div>
+            <form onsubmit="saveComite(event)">
+                <div class="input-group">
+                    <label>Nom Complet</label>
+                    <input type="text" id="edit-comite-nom" required>
+                </div>
+                <div class="input-group">
+                    <label>Rôle</label>
+                    <input type="text" id="edit-comite-role" required>
+                </div>
+                <div class="input-group">
+                    <label>Filière</label>
+                    <input type="text" id="edit-comite-filiere" required>
+                </div>
+                <div class="input-group">
+                    <label>Présence</label>
+                    <select id="edit-comite-present">
+                        <option value="true">Présent</option>
+                        <option value="false">Absent</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Justification</label>
+                    <input type="text" id="edit-comite-justif">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Sauvegarder</button>
+            </form>
+        </div>
+    </div>
+
     <div class="modal" id="modal-export">
         <div class="modal-content">
             <div class="modal-header">
@@ -636,7 +713,7 @@
             <p style="margin-bottom: 20px; color: #666;">Choisissez le format d'export pour l'onglet actif :</p>
             <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportCSV()">📊 Exporter en CSV (Donneurs)</button>
             <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportPDF()">📄 Exporter en PDF (Onglet Actif)</button>
-            <button class="btn btn-secondary" style="width: 100%;" onclick="exportJSON()">📋 Exporter en JSON (Backup)</button>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="exportJSON()">📋 Sauvegarder tout en JSON</button>
         </div>
     </div>
 
@@ -716,9 +793,9 @@
         ];
 
         let comite = [
-            { nom: "Karim Ameziane", role: "Responsable", present: true, justification: "" },
-            { nom: "Layla Bennani", role: "Infirmière", present: true, justification: "" },
-            { nom: "Omar Siddiq", role: "Coordinateur", present: false, justification: "Urgence familiale" },
+            { id: 1, nom: "Karim Ameziane", role: "Responsable", filiere: "G.Info", present: true, justification: "" },
+            { id: 2, nom: "Layla Bennani", role: "Infirmière", filiere: "Médical", present: true, justification: "" },
+            { id: 3, nom: "Omar Siddiq", role: "Coordinateur", filiere: "G.Indus", present: false, justification: "Urgence familiale" },
         ];
 
         // FONCTIONS
@@ -744,7 +821,9 @@
         }
 
         let editingId = null;
+        let editingComiteId = null;
 
+        // --- GESTION DONNEURS ---
         function renderDonneurs() {
             const tbody = document.getElementById('donneurs-table');
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
@@ -770,21 +849,75 @@
 
         document.getElementById('search-input').addEventListener('keyup', renderDonneurs);
 
+        // --- GESTION COMITÉ ---
         function renderComite() {
             const tbody = document.getElementById('comite-table');
             tbody.innerHTML = comite.map(c => `
                 <tr>
                     <td><strong>${c.nom}</strong></td>
                     <td>${c.role}</td>
+                    <td>${c.filiere || '-'}</td>
                     <td><span class="status-badge ${c.present ? 'status-present' : 'status-absent'}">${c.present ? 'Présent' : 'Absent'}</span></td>
                     <td>${c.justification || '-'}</td>
                     <td>
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editComite('${c.nom}')">✏️</button>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editComite(${c.id})">✏️</button>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="deleteComite(${c.id})" style="background: rgba(230, 57, 70, 0.1); color: #E63946;">🗑️</button>
                     </td>
                 </tr>
             `).join('');
         }
 
+        function addComite(e) {
+            e.preventDefault();
+            const nouveau = {
+                id: Math.max(...comite.map(c => c.id || 0), 0) + 1,
+                nom: document.getElementById('comite-nom').value,
+                role: document.getElementById('comite-role').value,
+                filiere: document.getElementById('comite-filiere').value,
+                present: document.getElementById('comite-present').value === 'true',
+                justification: document.getElementById('comite-justif').value
+            };
+            comite.push(nouveau);
+            closeModal('add-comite');
+            e.target.reset();
+            renderComite();
+        }
+
+        function editComite(id) {
+            editingComiteId = id;
+            const membre = comite.find(c => c.id === id);
+            if (membre) {
+                document.getElementById('edit-comite-nom').value = membre.nom;
+                document.getElementById('edit-comite-role').value = membre.role;
+                document.getElementById('edit-comite-filiere').value = membre.filiere || '';
+                document.getElementById('edit-comite-present').value = membre.present;
+                document.getElementById('edit-comite-justif').value = membre.justification;
+                openModal('edit-comite');
+            }
+        }
+
+        function saveComite(e) {
+            e.preventDefault();
+            const membre = comite.find(c => c.id === editingComiteId);
+            if (membre) {
+                membre.nom = document.getElementById('edit-comite-nom').value;
+                membre.role = document.getElementById('edit-comite-role').value;
+                membre.filiere = document.getElementById('edit-comite-filiere').value;
+                membre.present = document.getElementById('edit-comite-present').value === 'true';
+                membre.justification = document.getElementById('edit-comite-justif').value;
+                closeModal('edit-comite');
+                renderComite();
+            }
+        }
+
+        function deleteComite(id) {
+            if (confirm('Supprimer ce membre du comité ?')) {
+                comite = comite.filter(c => c.id !== id);
+                renderComite();
+            }
+        }
+
+        // --- GESTION SUIVI & STATS ---
         function renderSuivi() {
             const tbody = document.getElementById('suivi-table');
             const stats = calculateStats();
@@ -846,7 +979,6 @@
         function toggleStatus(id) {
             const donneur = donneurs.find(d => d.id === id);
             if (donneur) {
-                // Bascule entre absent et présent uniquement
                 donneur.status = donneur.status === 'present' ? 'absent' : 'present';
                 renderSuivi();
             }
@@ -863,7 +995,7 @@
                 ecole: document.getElementById('form-ecole').value,
                 filiere: document.getElementById('form-filiere').value,
                 remarques: document.getElementById('form-remarques').value,
-                status: 'absent' // MODIFICATION ICI : Par défaut 'absent'
+                status: 'absent' 
             };
             donneurs.push(nouveau);
             closeModal('add');
@@ -878,6 +1010,8 @@
         function closeModal(type) {
             document.getElementById('modal-' + type).classList.remove('active');
         }
+
+        // --- EXPORT / IMPORT ---
 
         function exportCSV() {
             const filtered = donneurs.filter(d => d.numPrelevement && d.status === 'present' && d.ecole === 'ENSEM');
@@ -900,9 +1034,34 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'donneurs.json';
+            a.download = 'backup_don_sang_' + new Date().getTime() + '.json';
             a.click();
             closeModal('export');
+        }
+
+        function importJSONBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.donneurs) donneurs = data.donneurs;
+                    if (data.comite) comite = data.comite;
+                    
+                    alert("✅ Données restaurées avec succès !");
+                    // Rafraîchir toutes les vues
+                    const activeTab = document.querySelector('.tab-content.active').id;
+                    if (activeTab === 'donneurs') renderDonneurs();
+                    if (activeTab === 'comite') renderComite();
+                    if (activeTab === 'suivi') renderSuivi();
+                    if (activeTab === 'stats') renderStats();
+                } catch (error) {
+                    alert("Erreur: Fichier JSON invalide.");
+                }
+            };
+            reader.readAsText(file);
         }
 
         function editDonneur(id) {
@@ -943,11 +1102,6 @@
             }
         }
 
-        function editComite(nom) {
-            alert('Modification: ' + nom);
-        }
-
-        // --- FONCTION IMPORT EXCEL ROBUSTE ---
         function importExcel() {
             const file = document.getElementById('import-file').files[0];
             if (!file) {
@@ -965,41 +1119,36 @@
 
                     let count = 0;
                     jsonData.forEach(row => {
-                        // 1. NETTOYAGE DES CLÉS (Gestion des espaces cachés "Nom " vs "Nom")
                         let cleanRow = {};
                         Object.keys(row).forEach(key => {
                             cleanRow[key.trim()] = row[key];
                         });
 
-                        // 2. IMPORTATION
                         if (cleanRow['Nom'] || cleanRow['Nom Complet']) {
                             donneurs.push({
                                 id: Math.max(...donneurs.map(d => d.id), 0) + 1,
                                 nom: cleanRow['Nom'] || cleanRow['Nom Complet'] || 'Inconnu',
                                 tel: cleanRow['Téléphone'] || cleanRow['Tel'] || cleanRow['Phone'] || '', 
                                 creneau: cleanRow['Créneau'] || '09h00 – 10h00',
-                                
-                                // Champs par défaut
                                 numPrelevement: '', 
                                 ecole: 'ENSEM', 
                                 filiere: '',
                                 remarques: '',
-                                status: 'absent' // MODIFICATION ICI : Par défaut 'absent' lors de l'import
+                                status: 'absent' 
                             });
                             count++;
                         }
                     });
 
                     closeModal('import');
-                    document.getElementById('import-file').value = ''; // Reset input
+                    document.getElementById('import-file').value = ''; 
                     
                     if (count > 0) {
                         alert(`Succès ! ${count} donneurs ont été importés.`);
                     } else {
-                        alert("Aucune donnée valide trouvée. Vérifiez que le fichier contient une colonne 'Nom'.");
+                        alert("Aucune donnée valide trouvée.");
                     }
                     
-                    // Mise à jour de l'interface
                     renderDonneurs();
                     renderSuivi();
                     renderStats();
@@ -1012,7 +1161,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- FONCTION EXPORT PDF UNIFIÉE ---
         function exportPDF() {
             const activeTabId = document.querySelector('.tab-content.active').id;
             
@@ -1031,18 +1179,18 @@
                     <tr>
                         <th style="padding: 12px; border: 1px solid #ddd;">Nom</th>
                         <th style="padding: 12px; border: 1px solid #ddd;">Rôle</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Filière</th>
                         <th style="padding: 12px; border: 1px solid #ddd;">Présence</th>
-                        <th style="padding: 12px; border: 1px solid #ddd;">Justification</th>
                     </tr>`;
                     
                 tableBody = comite.map((c, i) => `
                     <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
                         <td style="padding: 10px; border: 1px solid #ddd;"><strong>${c.nom}</strong></td>
                         <td style="padding: 10px; border: 1px solid #ddd;">${c.role}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${c.filiere || '-'}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; color: ${c.present ? '#2A9D8F' : '#E63946'}">
                             ${c.present ? 'Présent' : 'Absent'}
                         </td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${c.justification || '-'}</td>
                     </tr>
                 `).join('');
 
@@ -1073,7 +1221,6 @@
                 `).join('');
 
             } else {
-                // Par défaut : Donneurs (Filtré pour ENSEM + Confirmés)
                 const filtered = donneurs.filter(d => d.numPrelevement && d.status === 'present' && d.ecole === 'ENSEM');
                 title = "RAPPORT OFFICIEL DES DONNEURS (ENSEM)";
                 subTitle = "Donneurs confirmés avec N° Prélèvement";
@@ -1138,7 +1285,6 @@
             closeModal('export');
         }
 
-        // Init
         renderDonneurs();
     </script>
 </body>
