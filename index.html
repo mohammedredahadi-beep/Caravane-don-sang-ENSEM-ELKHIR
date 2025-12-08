@@ -646,8 +646,8 @@
                 📂 Importer Donneurs (Excel)
                 <button class="modal-close" onclick="closeModal('import')">✕</button>
             </div>
-            <p style="margin-bottom: 20px; color: #666;">Sélectionnez un fichier Excel (.xlsx, .xls)</p>
-            <input type="file" id="import-file" accept=".xlsx,.xls" style="margin-bottom: 20px; padding: 10px; border: 2px dashed #D9D3E3; border-radius: 8px; width: 100%; cursor: pointer;">
+            <p style="margin-bottom: 20px; color: #666;">Sélectionnez un fichier Excel (.xlsx, .xls) ou CSV</p>
+            <input type="file" id="import-file" accept=".xlsx,.xls,.csv" style="margin-bottom: 20px; padding: 10px; border: 2px dashed #D9D3E3; border-radius: 8px; width: 100%; cursor: pointer;">
             <button class="btn btn-primary" style="width: 100%;" onclick="importExcel()">📥 Importer</button>
         </div>
     </div>
@@ -846,6 +846,7 @@
         function toggleStatus(id) {
             const donneur = donneurs.find(d => d.id === id);
             if (donneur) {
+                // Bascule entre absent et présent uniquement
                 donneur.status = donneur.status === 'present' ? 'absent' : 'present';
                 renderSuivi();
             }
@@ -862,7 +863,7 @@
                 ecole: document.getElementById('form-ecole').value,
                 filiere: document.getElementById('form-filiere').value,
                 remarques: document.getElementById('form-remarques').value,
-                status: 'pending'
+                status: 'absent' // MODIFICATION ICI : Par défaut 'absent'
             };
             donneurs.push(nouveau);
             closeModal('add');
@@ -946,11 +947,11 @@
             alert('Modification: ' + nom);
         }
 
-        // --- FONCTION IMPORT EXCEL CORRIGÉE ---
+        // --- FONCTION IMPORT EXCEL ROBUSTE ---
         function importExcel() {
             const file = document.getElementById('import-file').files[0];
             if (!file) {
-                alert('Veuillez sélectionner un fichier Excel.');
+                alert('Veuillez sélectionner un fichier (Excel ou CSV).');
                 return;
             }
 
@@ -964,18 +965,26 @@
 
                     let count = 0;
                     jsonData.forEach(row => {
-                        // On vérifie que les colonnes minimales existent (adapter selon votre Excel)
-                        if (row['Nom'] || row['Nom Complet']) {
+                        // 1. NETTOYAGE DES CLÉS (Gestion des espaces cachés "Nom " vs "Nom")
+                        let cleanRow = {};
+                        Object.keys(row).forEach(key => {
+                            cleanRow[key.trim()] = row[key];
+                        });
+
+                        // 2. IMPORTATION
+                        if (cleanRow['Nom'] || cleanRow['Nom Complet']) {
                             donneurs.push({
                                 id: Math.max(...donneurs.map(d => d.id), 0) + 1,
-                                nom: row['Nom'] || row['Nom Complet'] || 'Inconnu',
-                                tel: row['Téléphone'] || row['Tel'] || '',
-                                creneau: row['Créneau'] || '09h00 – 10h00',
-                                numPrelevement: row['N° Prélèvement'] || row['Num'] || '',
-                                ecole: row['École'] || row['Ecole'] || 'ENSEM', 
-                                filiere: row['Filière'] || row['Filiere'] || '',
-                                remarques: row['Remarques'] || '',
-                                status: 'pending'
+                                nom: cleanRow['Nom'] || cleanRow['Nom Complet'] || 'Inconnu',
+                                tel: cleanRow['Téléphone'] || cleanRow['Tel'] || cleanRow['Phone'] || '', 
+                                creneau: cleanRow['Créneau'] || '09h00 – 10h00',
+                                
+                                // Champs par défaut
+                                numPrelevement: '', 
+                                ecole: 'ENSEM', 
+                                filiere: '',
+                                remarques: '',
+                                status: 'absent' // MODIFICATION ICI : Par défaut 'absent' lors de l'import
                             });
                             count++;
                         }
@@ -983,16 +992,21 @@
 
                     closeModal('import');
                     document.getElementById('import-file').value = ''; // Reset input
-                    alert(`Succès ! ${count} donneurs ont été importés.`);
                     
-                    // Mise à jour de toute l'interface
+                    if (count > 0) {
+                        alert(`Succès ! ${count} donneurs ont été importés.`);
+                    } else {
+                        alert("Aucune donnée valide trouvée. Vérifiez que le fichier contient une colonne 'Nom'.");
+                    }
+                    
+                    // Mise à jour de l'interface
                     renderDonneurs();
                     renderSuivi();
                     renderStats();
                     
                 } catch (error) {
                     console.error(error);
-                    alert('Erreur lors de la lecture du fichier Excel.');
+                    alert('Erreur lors de la lecture du fichier.');
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1052,7 +1066,7 @@
                         <td style="padding: 10px; border: 1px solid #ddd;"><strong>${d.nom}</strong></td>
                         <td style="padding: 10px; border: 1px solid #ddd;">
                             <span style="padding: 4px 8px; border-radius: 4px; background: ${d.status === 'present' ? '#D4EDDA' : '#F8D7DA'}; color: ${d.status === 'present' ? '#155724' : '#721c24'};">
-                                ${d.status === 'present' ? 'PRÉSENT' : 'ABSENT/ATTENTE'}
+                                ${d.status === 'present' ? 'PRÉSENT' : 'ABSENT'}
                             </span>
                         </td>
                     </tr>
