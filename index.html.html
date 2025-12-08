@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Caravane Don de Sang - ENSEM CIDH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #3E2B5F;
+            --primary-light: #6B4FA0;
+            --accent-light: #9B7FC4;
+            --accent-lavender: #E8DFF5;
+            --red-accent: #E63946;
+            --green-accent: #2A9D8F;
+            --neutral-dark: #1F1F1F;
+            --neutral-light: #F8F9FA;
+            --border-color: #D9D3E3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            min-height: 100vh;
+            color: var(--neutral-dark);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: rgba(62, 43, 95, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            border-right: 1px solid rgba(155, 127, 196, 0.3);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .logo-section img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+        }
+
+        .logo-section h1 {
+            font-size: 14px;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            padding: 14px 16px;
+            background: rgba(155, 127, 196, 0.1);
+            border: 2px solid transparent;
+            border-left: 3px solid transparent;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover {
+            background: rgba(155, 127, 196, 0.25);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(230, 57, 70, 0.15);
+            border-left-color: var(--red-accent);
+            color: white;
+            box-shadow: inset 0 0 10px rgba(230, 57, 70, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 28px;
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--red-accent), #ff5f6b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--neutral-light);
+            color: var(--primary-dark);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-lavender);
+            border-color: var(--accent-light);
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background: linear-gradient(to bottom, #f5f3f9 0%, #ffffff 50%);
+        }
+
+        /* TABS CONTENT */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS & SECTIONS */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(62, 43, 95, 0.08);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--red-accent);
+            border-radius: 2px;
+        }
+
+        /* TABLE STYLES */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead tr {
+            background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+
+        th {
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: var(--accent-lavender);
+            transition: all 0.2s ease;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-present {
+            background: rgba(42, 157, 143, 0.15);
+            color: var(--green-accent);
+        }
+
+        .status-absent {
+            background: rgba(230, 57, 70, 0.15);
+            color: var(--red-accent);
+        }
+
+        .status-pending {
+            background: rgba(155, 127, 196, 0.15);
+            color: var(--primary-light);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(107, 79, 160, 0.1);
+        }
+
+        /* GRID LAYOUT */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(62, 43, 95, 0.2);
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--primary-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--red-accent);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .grid-3 { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .sidebar { width: 100%; padding: 20px; display: flex; flex-direction: row; overflow-x: auto; }
+            .nav-menu { flex-direction: row; gap: 5px; flex-wrap: wrap; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+            .content-area { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div>
+                <div class="logo-section">
+                    <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/553616c3-1f4f-49ec-a23d-3e9db473cf4d" alt="ENSEM CIDH">
+                    <h1>ENSEM ELKHIR</h1>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="switchTab('donneurs')">
+                    <span class="nav-icon">👥</span>
+                    <span>Donneurs</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('comite')">
+                    <span class="nav-icon">📋</span>
+                    <span>Comité</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('suivi')">
+                    <span class="nav-icon">✅</span>
+                    <span>Suivi Jour J</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('stats')">
+                    <span class="nav-icon">📊</span>
+                    <span>Statistiques</span>
+                </div>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h2 id="page-title">Gestion des Donneurs</h2>
+                <div class="header-actions">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="search-input" placeholder="🔍 Rechercher..." style="padding: 12px 16px; border: 2px solid #D9D3E3; border-radius: 10px; width: 250px; font-size: 14px;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="openModal('export')">📥 Exporter</button>
+                    <button class="btn btn-primary" onclick="openModal('add')">➕ Ajouter</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="tab-content active" id="donneurs">
+                    <div class="card">
+                        <h3>Liste des Donneurs Inscrits</h3>
+                        <button class="btn btn-secondary" style="margin-bottom: 15px;" onclick="openModal('import')">📂 Importer Excel</button>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nom</th>
+                                        <th>Téléphone</th>
+                                        <th>Créneau</th>
+                                        <th>N° Prélèvement</th>
+                                        <th>École</th>
+                                        <th>Filière</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="donneurs-table">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="comite">
+                    <div class="card">
+                        <h3>Gestion du Comité Organisateur</h3>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Rôle</th>
+                                        <th>Présence</th>
+                                        <th>Justification</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comite-table">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="suivi">
+                    <div class="grid-2">
+                        <div class="stat-card">
+                            <div class="stat-label">Inscrits</div>
+                            <div class="stat-number" id="stat-inscrits">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Présents</div>
+                            <div class="stat-number" id="stat-presents">0</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Pointage en Temps Réel</h3>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Créneau</th>
+                                        <th>État</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suivi-table">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="stats">
+                    <div class="grid-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Inscrits</div>
+                            <div class="stat-number" id="total-inscrits">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Présents</div>
+                            <div class="stat-number" id="total-presents">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Taux de Présence</div>
+                            <div class="stat-number" id="taux-presence">0%</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Distribution par Créneau</h3>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Créneau</th>
+                                        <th>Inscrits</th>
+                                        <th>Présents</th>
+                                        <th>Absence</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stats-table">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-add">
+        <div class="modal-content">
+            <div class="modal-header">
+                ➕ Ajouter Donneur
+                <button class="modal-close" onclick="closeModal('add')">✕</button>
+            </div>
+            <form onsubmit="addDonneur(event)">
+                <div class="input-group">
+                    <label>Nom Complet</label>
+                    <input type="text" id="form-nom" required>
+                </div>
+                <div class="input-group">
+                    <label>Téléphone</label>
+                    <input type="tel" id="form-tel" required>
+                </div>
+                <div class="input-group">
+                    <label>Créneau</label>
+                    <select id="form-creneau" required>
+                        <option value="">Choisir...</option>
+                        <option value="09h00 – 10h00">09h00 – 10h00</option>
+                        <option value="10h00 – 11h00">10h00 – 11h00</option>
+                        <option value="11h00 – 12h00">11h00 – 12h00</option>
+                        <option value="12h00 - 13h00">12h00 - 13h00</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>N° Prélèvement</label>
+                    <input type="text" id="form-numPrelevement" placeholder="ex: P001">
+                </div>
+                <div class="input-group">
+                    <label>École</label>
+                    <select id="form-ecole" required>
+                        <option value="">Choisir...</option>
+                        <option value="ENS">ENS</option>
+                        <option value="ENSEM">ENSEM</option>
+                        <option value="ESITH">ESITH</option>
+                        <option value="EHTP">EHTP</option>
+                        <option value="EST">EST</option>
+                        <option value="ISEM">ISEM</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Filière</label>
+                    <input type="text" id="form-filiere" placeholder="ex: Génie Informatique">
+                </div>
+                <div class="input-group">
+                    <label>Remarques</label>
+                    <textarea id="form-remarques" placeholder="Notes supplémentaires..." style="resize: vertical; min-height: 60px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Ajouter Donneur</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-export">
+        <div class="modal-content">
+            <div class="modal-header">
+                📥 Exporter les Données
+                <button class="modal-close" onclick="closeModal('export')">✕</button>
+            </div>
+            <p style="margin-bottom: 20px; color: #666;">Choisissez le format d'export pour l'onglet actif :</p>
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportCSV()">📊 Exporter en CSV (Donneurs)</button>
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportPDF()">📄 Exporter en PDF (Onglet Actif)</button>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="exportJSON()">📋 Exporter en JSON (Backup)</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-import">
+        <div class="modal-content">
+            <div class="modal-header">
+                📂 Importer Donneurs (Excel)
+                <button class="modal-close" onclick="closeModal('import')">✕</button>
+            </div>
+            <p style="margin-bottom: 20px; color: #666;">Sélectionnez un fichier Excel (.xlsx, .xls)</p>
+            <input type="file" id="import-file" accept=".xlsx,.xls" style="margin-bottom: 20px; padding: 10px; border: 2px dashed #D9D3E3; border-radius: 8px; width: 100%; cursor: pointer;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="importExcel()">📥 Importer</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-edit">
+        <div class="modal-content">
+            <div class="modal-header">
+                ✏️ Modifier Donneur
+                <button class="modal-close" onclick="closeModal('edit')">✕</button>
+            </div>
+            <form onsubmit="saveDonneur(event)">
+                <div class="input-group">
+                    <label>Nom Complet</label>
+                    <input type="text" id="edit-nom" required>
+                </div>
+                <div class="input-group">
+                    <label>Téléphone</label>
+                    <input type="tel" id="edit-tel" required>
+                </div>
+                <div class="input-group">
+                    <label>Créneau</label>
+                    <select id="edit-creneau" required>
+                        <option value="09h00 – 10h00">09h00 – 10h00</option>
+                        <option value="10h00 – 11h00">10h00 – 11h00</option>
+                        <option value="11h00 – 12h00">11h00 – 12h00</option>
+                        <option value="12h00 - 13h00">12h00 - 13h00</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>N° Prélèvement</label>
+                    <input type="text" id="edit-numPrelevement" placeholder="ex: P001">
+                </div>
+                <div class="input-group">
+                    <label>École</label>
+                    <select id="edit-ecole" required>
+                        <option value="">Choisir...</option>
+                        <option value="ENS">ENS</option>
+                        <option value="ENSEM">ENSEM</option>
+                        <option value="ESITH">ESITH</option>
+                        <option value="EHTP">EHTP</option>
+                        <option value="EST">EST</option>
+                        <option value="ISEM">ISEM</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Filière</label>
+                    <input type="text" id="edit-filiere" placeholder="ex: Génie Informatique">
+                </div>
+                <div class="input-group">
+                    <label>Remarques</label>
+                    <textarea id="edit-remarques" placeholder="Notes supplémentaires..." style="resize: vertical; min-height: 60px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Modifier</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // DONNÉES (simulées)
+        let donneurs = [
+            { id: 1, nom: "Ahmed Ben Ali", tel: "0612345678", creneau: "09h00 – 10h00", numPrelevement: "P001", ecole: "ENSEM", filiere: "Génie Informatique", remarques: "", status: "present" },
+            { id: 2, nom: "Fatima Zahra", tel: "0687654321", creneau: "10h00 – 11h00", numPrelevement: "P002", ecole: "ESITH", filiere: "Génie Civil", remarques: "Allergie connue", status: "present" },
+            { id: 3, nom: "Mohamed Hassan", tel: "0698765432", creneau: "11h00 – 12h00", numPrelevement: "", ecole: "EHTP", filiere: "Management", remarques: "", status: "absent" },
+        ];
+
+        let comite = [
+            { nom: "Karim Ameziane", role: "Responsable", present: true, justification: "" },
+            { nom: "Layla Bennani", role: "Infirmière", present: true, justification: "" },
+            { nom: "Omar Siddiq", role: "Coordinateur", present: false, justification: "Urgence familiale" },
+        ];
+
+        // FONCTIONS
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+
+            const titles = {
+                donneurs: 'Gestion des Donneurs',
+                comite: 'Gestion du Comité',
+                suivi: 'Suivi Jour J',
+                stats: 'Statistiques'
+            };
+            document.getElementById('page-title').textContent = titles[tabName];
+
+            if (tabName === 'donneurs') renderDonneurs();
+            if (tabName === 'comite') renderComite();
+            if (tabName === 'suivi') renderSuivi();
+            if (tabName === 'stats') renderStats();
+        }
+
+        let editingId = null;
+
+        function renderDonneurs() {
+            const tbody = document.getElementById('donneurs-table');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = donneurs.filter(d => d.nom.toLowerCase().includes(searchTerm));
+            
+            tbody.innerHTML = filtered.map((d, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td><strong>${d.nom}</strong></td>
+                    <td>${d.tel}</td>
+                    <td>${d.creneau}</td>
+                    <td>${d.numPrelevement || '-'}</td>
+                    <td>${d.ecole}</td>
+                    <td>${d.filiere}</td>
+                    <td><span class="status-badge status-${d.status}">${d.status === 'present' ? 'Présent' : d.status === 'absent' ? 'Absent' : 'En attente'}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;" onclick="editDonneur(${d.id})">✏️</button>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="deleteDonneur(${d.id})" style="background: rgba(230, 57, 70, 0.1); color: #E63946;">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('search-input').addEventListener('keyup', renderDonneurs);
+
+        function renderComite() {
+            const tbody = document.getElementById('comite-table');
+            tbody.innerHTML = comite.map(c => `
+                <tr>
+                    <td><strong>${c.nom}</strong></td>
+                    <td>${c.role}</td>
+                    <td><span class="status-badge ${c.present ? 'status-present' : 'status-absent'}">${c.present ? 'Présent' : 'Absent'}</span></td>
+                    <td>${c.justification || '-'}</td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editComite('${c.nom}')">✏️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSuivi() {
+            const tbody = document.getElementById('suivi-table');
+            const stats = calculateStats();
+            document.getElementById('stat-inscrits').textContent = donneurs.length;
+            document.getElementById('stat-presents').textContent = stats.presents;
+
+            tbody.innerHTML = donneurs.map((d, i) => `
+                <tr>
+                    <td><strong>${d.nom}</strong></td>
+                    <td>${d.creneau}</td>
+                    <td><span class="status-badge status-${d.status}">${d.status === 'present' ? '✓ Présent' : '✗ Absent'}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" 
+                            onclick="toggleStatus(${d.id})">
+                            ${d.status === 'present' ? 'Marquer absent' : 'Marquer présent'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderStats() {
+            const stats = calculateStats();
+            const creneaux = groupByCreneaux();
+
+            document.getElementById('total-inscrits').textContent = donneurs.length;
+            document.getElementById('total-presents').textContent = stats.presents;
+            document.getElementById('taux-presence').textContent = Math.round((stats.presents / donneurs.length) * 100) + '%';
+
+            const tbody = document.getElementById('stats-table');
+            tbody.innerHTML = Object.entries(creneaux).map(([creneau, data]) => `
+                <tr>
+                    <td><strong>${creneau}</strong></td>
+                    <td>${data.total}</td>
+                    <td><span class="status-badge status-present">${data.presents}</span></td>
+                    <td><span class="status-badge status-absent">${data.absents}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function calculateStats() {
+            return {
+                presents: donneurs.filter(d => d.status === 'present').length,
+                absents: donneurs.filter(d => d.status === 'absent').length
+            };
+        }
+
+        function groupByCreneaux() {
+            const result = {};
+            donneurs.forEach(d => {
+                if (!result[d.creneau]) result[d.creneau] = { total: 0, presents: 0, absents: 0 };
+                result[d.creneau].total++;
+                if (d.status === 'present') result[d.creneau].presents++;
+                else result[d.creneau].absents++;
+            });
+            return result;
+        }
+
+        function toggleStatus(id) {
+            const donneur = donneurs.find(d => d.id === id);
+            if (donneur) {
+                donneur.status = donneur.status === 'present' ? 'absent' : 'present';
+                renderSuivi();
+            }
+        }
+
+        function addDonneur(e) {
+            e.preventDefault();
+            const nouveau = {
+                id: Math.max(...donneurs.map(d => d.id), 0) + 1,
+                nom: document.getElementById('form-nom').value,
+                tel: document.getElementById('form-tel').value,
+                creneau: document.getElementById('form-creneau').value,
+                numPrelevement: document.getElementById('form-numPrelevement').value,
+                ecole: document.getElementById('form-ecole').value,
+                filiere: document.getElementById('form-filiere').value,
+                remarques: document.getElementById('form-remarques').value,
+                status: 'pending'
+            };
+            donneurs.push(nouveau);
+            closeModal('add');
+            e.target.reset();
+            renderDonneurs();
+        }
+
+        function openModal(type) {
+            document.getElementById('modal-' + type).classList.add('active');
+        }
+
+        function closeModal(type) {
+            document.getElementById('modal-' + type).classList.remove('active');
+        }
+
+        function exportCSV() {
+            const filtered = donneurs.filter(d => d.numPrelevement && d.status === 'present' && d.ecole === 'ENSEM');
+            const headers = ['Nom Complet', 'N° Prélèvement', 'Filière'];
+            const rows = filtered.map(d => [d.nom, d.numPrelevement, d.filiere]);
+            const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv; charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'donneurs_ENSEM_' + new Date().getTime() + '.csv';
+            a.click();
+            closeModal('export');
+        }
+
+        function exportJSON() {
+            const json = JSON.stringify({ donneurs, comite }, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'donneurs.json';
+            a.click();
+            closeModal('export');
+        }
+
+        function editDonneur(id) {
+            editingId = id;
+            const donneur = donneurs.find(d => d.id === id);
+            if (donneur) {
+                document.getElementById('edit-nom').value = donneur.nom;
+                document.getElementById('edit-tel').value = donneur.tel;
+                document.getElementById('edit-creneau').value = donneur.creneau;
+                document.getElementById('edit-numPrelevement').value = donneur.numPrelevement;
+                document.getElementById('edit-ecole').value = donneur.ecole;
+                document.getElementById('edit-filiere').value = donneur.filiere;
+                document.getElementById('edit-remarques').value = donneur.remarques;
+                openModal('edit');
+            }
+        }
+
+        function saveDonneur(e) {
+            e.preventDefault();
+            const donneur = donneurs.find(d => d.id === editingId);
+            if (donneur) {
+                donneur.nom = document.getElementById('edit-nom').value;
+                donneur.tel = document.getElementById('edit-tel').value;
+                donneur.creneau = document.getElementById('edit-creneau').value;
+                donneur.numPrelevement = document.getElementById('edit-numPrelevement').value;
+                donneur.ecole = document.getElementById('edit-ecole').value;
+                donneur.filiere = document.getElementById('edit-filiere').value;
+                donneur.remarques = document.getElementById('edit-remarques').value;
+                closeModal('edit');
+                renderDonneurs();
+            }
+        }
+
+        function deleteDonneur(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce donneur?')) {
+                donneurs = donneurs.filter(d => d.id !== id);
+                renderDonneurs();
+            }
+        }
+
+        function editComite(nom) {
+            alert('Modification: ' + nom);
+        }
+
+        // --- FONCTION IMPORT EXCEL CORRIGÉE ---
+        function importExcel() {
+            const file = document.getElementById('import-file').files[0];
+            if (!file) {
+                alert('Veuillez sélectionner un fichier Excel.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    let count = 0;
+                    jsonData.forEach(row => {
+                        // On vérifie que les colonnes minimales existent (adapter selon votre Excel)
+                        if (row['Nom'] || row['Nom Complet']) {
+                            donneurs.push({
+                                id: Math.max(...donneurs.map(d => d.id), 0) + 1,
+                                nom: row['Nom'] || row['Nom Complet'] || 'Inconnu',
+                                tel: row['Téléphone'] || row['Tel'] || '',
+                                creneau: row['Créneau'] || '09h00 – 10h00',
+                                numPrelevement: row['N° Prélèvement'] || row['Num'] || '',
+                                ecole: row['École'] || row['Ecole'] || 'ENSEM', 
+                                filiere: row['Filière'] || row['Filiere'] || '',
+                                remarques: row['Remarques'] || '',
+                                status: 'pending'
+                            });
+                            count++;
+                        }
+                    });
+
+                    closeModal('import');
+                    document.getElementById('import-file').value = ''; // Reset input
+                    alert(`Succès ! ${count} donneurs ont été importés.`);
+                    
+                    // Mise à jour de toute l'interface
+                    renderDonneurs();
+                    renderSuivi();
+                    renderStats();
+                    
+                } catch (error) {
+                    console.error(error);
+                    alert('Erreur lors de la lecture du fichier Excel.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // --- FONCTION EXPORT PDF UNIFIÉE ---
+        function exportPDF() {
+            const activeTabId = document.querySelector('.tab-content.active').id;
+            
+            let title = "";
+            let subTitle = "";
+            let tableHeader = "";
+            let tableBody = "";
+            let dataCount = 0;
+
+            if (activeTabId === 'comite') {
+                title = "MEMBRES DU COMITÉ D'ORGANISATION";
+                subTitle = "Liste de présence et rôles";
+                dataCount = comite.length;
+                
+                tableHeader = `
+                    <tr>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Nom</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Rôle</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Présence</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Justification</th>
+                    </tr>`;
+                    
+                tableBody = comite.map((c, i) => `
+                    <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
+                        <td style="padding: 10px; border: 1px solid #ddd;"><strong>${c.nom}</strong></td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${c.role}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; color: ${c.present ? '#2A9D8F' : '#E63946'}">
+                            ${c.present ? 'Présent' : 'Absent'}
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${c.justification || '-'}</td>
+                    </tr>
+                `).join('');
+
+            } else if (activeTabId === 'suivi') {
+                title = "FEUILLE DE POINTAGE - SUIVI JOUR J";
+                subTitle = "État en temps réel des inscrits";
+                dataCount = donneurs.length;
+                
+                tableHeader = `
+                    <tr>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Heure</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Nom du Donneur</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">État</th>
+                    </tr>`;
+                
+                const sortedDonneurs = [...donneurs].sort((a,b) => a.creneau.localeCompare(b.creneau));
+                
+                tableBody = sortedDonneurs.map((d, i) => `
+                    <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
+                        <td style="padding: 10px; border: 1px solid #ddd;">${d.creneau}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;"><strong>${d.nom}</strong></td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">
+                            <span style="padding: 4px 8px; border-radius: 4px; background: ${d.status === 'present' ? '#D4EDDA' : '#F8D7DA'}; color: ${d.status === 'present' ? '#155724' : '#721c24'};">
+                                ${d.status === 'present' ? 'PRÉSENT' : 'ABSENT/ATTENTE'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } else {
+                // Par défaut : Donneurs (Filtré pour ENSEM + Confirmés)
+                const filtered = donneurs.filter(d => d.numPrelevement && d.status === 'present' && d.ecole === 'ENSEM');
+                title = "RAPPORT OFFICIEL DES DONNEURS (ENSEM)";
+                subTitle = "Donneurs confirmés avec N° Prélèvement";
+                dataCount = filtered.length;
+                
+                tableHeader = `
+                    <tr>
+                        <th style="padding: 12px; border: 1px solid #ddd;">#</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Nom Complet</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">N° Prélèvement</th>
+                        <th style="padding: 12px; border: 1px solid #ddd;">Filière</th>
+                    </tr>`;
+                    
+                tableBody = filtered.map((d, i) => `
+                    <tr style="background: ${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
+                        <td style="padding: 10px; border: 1px solid #ddd;">${i + 1}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;"><strong>${d.nom}</strong></td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${d.numPrelevement}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${d.filiere}</td>
+                    </tr>
+                `).join('');
+            }
+
+            const element = document.createElement('div');
+            element.style.padding = '20px';
+            element.style.fontFamily = 'Arial, sans-serif';
+            
+            element.innerHTML = `
+                <div style="background: linear-gradient(135deg, #3E2B5F 0%, #6B4FA0 100%); color: white; padding: 25px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 24px; font-weight: bold;">🩸 CARAVANE ENSEM CIDH</h1>
+                    <h2 style="margin: 5px 0 0 0; font-size: 16px; font-weight: normal;">${title}</h2>
+                    <p style="margin: 10px 0 0 0; font-size: 12px;">${subTitle}</p>
+                </div>
+                
+                <div style="text-align: right; margin-bottom: 10px; color: #666;">
+                    <strong>Total entrées :</strong> ${dataCount}
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px;">
+                    <thead style="background: #3E2B5F; color: white;">
+                        ${tableHeader}
+                    </thead>
+                    <tbody>
+                        ${tableBody}
+                    </tbody>
+                </table>
+
+                <div style="text-align: center; color: #999; font-size: 10px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 10px;">
+                    Généré le ${new Date().toLocaleString('fr-FR')}
+                </div>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: `export_${activeTabId}_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+            closeModal('export');
+        }
+
+        // Init
+        renderDonneurs();
+    </script>
+</body>
+</html>
